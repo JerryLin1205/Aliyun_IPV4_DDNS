@@ -2,7 +2,7 @@
 # pip install aliyun-python-sdk-domain
 # pip install aliyun-python-sdk-alidns
 # pip install requests
-import imp
+import importlib
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkcore.acs_exception.exceptions import ClientException
 from aliyunsdkcore.acs_exception.exceptions import ServerException
@@ -10,7 +10,6 @@ from aliyunsdkalidns.request.v20150109.DescribeSubDomainRecordsRequest import De
 from aliyunsdkalidns.request.v20150109.DescribeDomainRecordsRequest import DescribeDomainRecordsRequest
 from urllib.request import urlopen
 from urllib.error import HTTPError, URLError
-from urllib3.exceptions import ProtocolError
 import requests
 import json
 import time
@@ -21,9 +20,9 @@ import sys
 # Disable https certification verification
 ssl._create_default_https_context = ssl._create_unverified_context     
 
-ipv4_flag = 1  						            # 是否开启ipv4 ddns解析,1为开启，0为关闭
-accessKeyId = "xxxxxxx"  		                # 将accessKeyId改成自己的accessKeyId
-accessSecret = "xxxxxx"  	                    # 将accessSecret改成自己的accessSecret
+ipv4_flag = 1  						                # 是否开启ipv4 ddns解析,1为开启，0为关闭
+accessKeyId = "xxxxxxx"  		    # 将accessKeyId改成自己的accessKeyId
+accessSecret = "xxxxxxx"  	# 将accessSecret改成自己的accessSecret
 domain = "xxxx.com"  				            # 你的主域名
 
 def update(RecordId, RR, Type, Value):  		    # 修改域名解析记录
@@ -55,7 +54,7 @@ try:
     ip = urlopen('https://api-ipv4.ip.sb/ip').read()  	# 使用IP.SB的接口获取ipv4地址
     ipv4 = str(ip, encoding='utf-8')
     print("获取到IPv4地址：%s" % ipv4)    
-except (HTTPError, URLError, ProtocolError) as e:
+except (HTTPError, URLError) as e:
     print("获取当前IP地址发生异常，退出脚本")
     sys.exit(1)
 
