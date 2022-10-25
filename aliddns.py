@@ -2,7 +2,6 @@
 # pip install aliyun-python-sdk-domain
 # pip install aliyun-python-sdk-alidns
 # pip install requests
-import importlib
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkcore.acs_exception.exceptions import ClientException
 from aliyunsdkcore.acs_exception.exceptions import ServerException
@@ -21,9 +20,9 @@ import sys
 ssl._create_default_https_context = ssl._create_unverified_context     
 
 ipv4_flag = 1  						                # 是否开启ipv4 ddns解析,1为开启，0为关闭
-accessKeyId = "xxxxxxx"  		    # 将accessKeyId改成自己的accessKeyId
-accessSecret = "xxxxxxx"  	# 将accessSecret改成自己的accessSecret
-domain = "xxxx.com"  				            # 你的主域名
+accessKeyId = "xxxxxxx"  		                    # 将accessKeyId改成自己的accessKeyId
+accessSecret = "xxxxxx"  	                        # 将accessSecret改成自己的accessSecret
+domain = "xxxxx.com"  				                # 你的主域名
 
 def update(RecordId, RR, Type, Value):  		    # 修改域名解析记录
     from aliyunsdkalidns.request.v20150109.UpdateDomainRecordRequest import UpdateDomainRecordRequest
@@ -47,17 +46,24 @@ def add(DomainName, RR, Type, Value):  			    # 添加新的域名解析记录
 
 print("================开始执行程序=================")
 print(time.strftime("%Y-%m-%d %H:%M:%S"))
-
+ipAPIList = ["http://ip.42.pl/raw","http://myip.ipip.net/s","http://ident.me/","http://ip.3322.net/",
+            "https://api-ipv4.ip.sb/ip","http://api.ipify.org/","http://ip.cip.cc/"]            
 client = AcsClient(accessKeyId, accessSecret, 'cn-hangzhou')
 
-try:
-    ip = urlopen('https://api-ipv4.ip.sb/ip').read()  	# 使用IP.SB的接口获取ipv4地址
-    ipv4 = str(ip, encoding='utf-8')
-    print("获取到IPv4地址：%s" % ipv4)    
-except (HTTPError, URLError) as e:
-    print("获取当前IP地址发生异常，退出脚本")
-    sys.exit(1)
-
+for ipAPI in ipAPIList:
+    try:
+        #ip = urlopen('https://api-ipv4.ip.sb/ip').read()  	# 使用IP.SB的接口获取ipv4地址
+        print("开始调用地址 %s" %ipAPI)
+        ip = urlopen(ipAPI).read()
+        ipv4 = str(ip, encoding='utf-8')
+        print("获取到IPv4地址：%s" %ipv4)    
+        break
+    except (HTTPError, URLError) as e:
+        print("当前地址发生异常，尝试下一个地址")
+        if ipAPI == len(ipAPIList) - 1:
+            print("退出脚本")
+            sys.exit(1)
+            
 def ddns_update(RR):
     print("当前RR值：%s"%(RR))
     if ipv4_flag == 1:
